@@ -150,10 +150,10 @@ E = 31
 # Tabla de gramaticas
 general_table = [
     [S, "EOF", None],
-    [S, "#INCLUDE", ["#INCLUDE", "GREATER_THAN", "IDENTIFIER", "LESS_THAN", Sp]],
+    [S, "#INCLUDE", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
     [S, "LEFT_PARENTHESIS", None],
     [S, "RIGHT_PARENTHESIS", None],
-    [S, "COMMENT", ["#INCLUDE", "GREATER_THAN", "IDENTIFIER", "LESS_THAN", Sp]],
+    [S, "COMMENT", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
 ]
 
 tabla = [
