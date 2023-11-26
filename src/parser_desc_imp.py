@@ -106,6 +106,7 @@ t_ignore = " \t"
 
 
 # Error handling rule
+# TODO: Implement this
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
@@ -148,21 +149,11 @@ E = 31
 
 # Tabla de gramaticas
 general_table = [
-    [S, "#INCLUDE", None],
-    [S, "INT", None],
-    [S, "CHAR", None],
-    [S, "FLOAT", None],
-    [S, "LINE_COMMENT", None],
-    [S, "BLOCK_COMMENT", None],
-    [Sp, "CHAR", None],
-    [Sp, "INT", None],
-    [Sp, "FLOAT", None],
-    [Sp, "COMMENT", None],
-    [O, "IDENTIFIER", ["RIGHT_PARENTHESIS", "INSTRUCTION_END", "COMMA", "EQUAL"]],
-    [O, "NUMBER", ["RIGHT_PARENTHESIS", "INSTRUCTION_END", "COMMA", "EQUAL"]],
-    [O, "LEFT_PARENTHESIS", ["RIGHT_PARENTHESIS", "INSTRUCTION_END", "COMMA", "EQUAL"]],
-    [Op, "PLUS", ["RIGHT_PARENTHESIS", "INSTRUCTION_END", "COMMA", "EQUAL"]],
-    [Op, "MINUS", ["RIGHT_PARENTHESIS", "INSTRUCTION_END", "COMMA", "EQUAL"]],
+    [S, "EOF", None],
+    [S, "#INCLUDE", ["#INCLUDE", "GREATER_THAN", "IDENTIFIER", "LESS_THAN", Sp]],
+    [S, "LEFT_PARENTHESIS", None],
+    [S, "RIGHT_PARENTHESIS", None],
+    [S, "COMMENT", ["#INCLUDE", "GREATER_THAN", "IDENTIFIER", "LESS_THAN", Sp]],
 ]
 
 tabla = [
