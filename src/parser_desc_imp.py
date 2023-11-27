@@ -4,6 +4,7 @@ import ply.lex as lex
 reserved = {
     "int": "INT",
     "char": "CHAR",
+    "string": "STRING",
     "float": "FLOAT",
     "void": "VOID",
     "if": "IF",
@@ -11,8 +12,7 @@ reserved = {
     "return": "RETURN",
     "while": "WHILE",
     "printf": "PRINTF",
-    "fgets": "FGETS",
-    "stdin": "STDIN",
+    "scanf": "SCANF",
     "#include": "INCLUDE",
 }
 
@@ -20,6 +20,8 @@ reserved = {
 tokens = [
     "IDENTIFIER",
     "EQUAL",
+    "LESS_THAN",
+    "GREATER_THAN",
     "LEFT_PARENTHESIS",
     "RIGHT_PARENTHESIS",
     "LEFT_BLOCK",
@@ -38,6 +40,7 @@ tokens = [
     "NUMBER",
     "COMMA",
     "STRING_DEFINITION",
+    "CHAR_DEFINITION",
     "EOF",
 ] + list(reserved.values())
 
@@ -51,6 +54,8 @@ def t_IDENTIFIER(t):
 
 
 t_EQUAL = r"\="
+t_LESS_THAN = r"\<"
+t_GREATER_THAN = r"\>"
 t_LEFT_PARENTHESIS = r"\("
 t_RIGHT_PARENTHESIS = r"\("
 t_LEFT_BLOCK = r"\{"
@@ -89,6 +94,11 @@ t_COMMA = r"\,"
 
 def t_STRING_DEFINITION(t):
     r"^\"(.+)\"$"
+    return t
+
+
+def t_CHAR_DEFINITION(t):
+    r"^\"[\w]$"
     return t
 
 
@@ -147,7 +157,76 @@ A = 29
 D = 30
 E = 31
 
-# Tabla de gramaticas
+# Gramaticas
+s_table = [
+    [S, "EOF", None],
+    [S, "INCLUDE", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
+    [S, "LEFT_PARENTHESIS", None],
+    [S, "RIGHT_PARENTHESIS", None],
+    [S, "LEFT_BLOCK", None],
+    [S, "RIGHT_BLOCK", None],
+    [S, "INSTRUCTION_END", None],
+    [S, "COMMA", None],
+    [S, "EQUAL", None],
+    [S, "LESS_THAN", None],
+    [S, "GREATER_THAN", None],
+    [S, "RIGHT_PARENTHESIS", None],
+    [S, "PLUS", None],
+    [S, "MINUS", None],
+    [S, "TIMES", None],
+    [S, "DIVIDE", None],
+    [S, "IDENTIFIER", None],
+    [S, "CHAR_DEFINITION", None],
+    [S, "NUMBER", None],
+    [S, "STRING_DEFINITION", None],
+    [S, "IF", None],
+    [S, "ELSE", None],
+    [S, "COMMENT", ["COMMENT", S]],
+    [S, "STRING", [F, Sp]],
+    [S, "CHAR", [F, Sp]],
+    [S, "INT", [F, Sp]],
+    [S, "FLOAT", [F, Sp]],
+    [S, "PRINTF", None],
+    [S, "SCANF", None],
+    [S, "WHILE", None],
+    [S, "return", None],
+]
+
+sp_table = [
+    [Sp, "EOF", "VACIA"],
+    [Sp, "INCLUDE", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
+    [Sp, "LEFT_PARENTHESIS", None],
+    [Sp, "RIGHT_PARENTHESIS", None],
+    [Sp, "LEFT_BLOCK", None],
+    [Sp, "RIGHT_BLOCK", None],
+    [Sp, "INSTRUCTION_END", None],
+    [Sp, "COMMA", None],
+    [Sp, "EQUAL", None],
+    [Sp, "LESS_THAN", None],
+    [Sp, "GREATER_THAN", None],
+    [Sp, "RIGHT_PARENTHESIS", None],
+    [Sp, "PLUS", None],
+    [Sp, "MINUS", None],
+    [Sp, "TIMES", None],
+    [Sp, "DIVIDE", None],
+    [Sp, "IDENTIFIER", None],
+    [Sp, "CHAR_DEFINITION", None],
+    [Sp, "NUMBER", None],
+    [Sp, "STRING_DEFINITION", None],
+    [Sp, "IF", None],
+    [Sp, "ELSE", None],
+    [Sp, "COMMENT", ["COMMENT", S]],
+    [Sp, "STRING", [F, Sp]],
+    [Sp, "CHAR", [F, Sp]],
+    [Sp, "INT", [F, Sp]],
+    [Sp, "FLOAT", [F, Sp]],
+    [Sp, "PRINTF", None],
+    [Sp, "SCANF", None],
+    [Sp, "WHILE", None],
+    [Sp, "return", None],
+]
+
+
 general_table = [
     [S, "EOF", None],
     [S, "#INCLUDE", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
