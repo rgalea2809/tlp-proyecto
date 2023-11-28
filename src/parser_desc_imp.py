@@ -130,6 +130,7 @@ O = 2
 Op = 3
 T = 4
 Tp = 5
+Ov = 51
 F = 6
 Fp = 7
 V = 8
@@ -157,7 +158,7 @@ A = 29
 D = 30
 E = 31
 
-tabla = [
+tabla_ejemplo = [
     [S, "IDENTIFIER", None],
     [S, "INT", [Tp, "IDENTIFIER", D]],
     [S, "FLOAT", [Tp, "IDENTIFIER", D]],
@@ -174,6 +175,8 @@ tabla = [
     [D, "COMMA", ["COMMA", "IDENTIFIER", D]],
     [D, "INSTRUCTION_END", ["INSTRUCTION_END"]],
 ]
+
+# Gramaticas
 
 stack = ["EOF", 0]
 
