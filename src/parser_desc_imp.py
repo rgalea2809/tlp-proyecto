@@ -191,7 +191,7 @@ lexer = lex.lex()
 
 
 def executeCustomParser():
-    f = open("c_example_two.c", "r")
+    f = open("c_example.c", "r")
     lexer.input(f.read())
 
     tok = lexer.token()
