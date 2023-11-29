@@ -5,38 +5,38 @@ O = 2
 Op = 3
 T = 4
 Tp = 5
-Ov = 51
-F = 6
-Fp = 7
-V = 8
-Vp = 9
-N = 10
-Np = 11
-Val = 12
-Dt = 13
-I = 14
-Ip = 15
-M = 16
-C = 17
-Cp = 18
-B = 19
-G = 20
-P = 21
-Pp = 22
-L = 23
-Lp = 24
-R = 25
-Sc = 26
-Pr = 27
-W = 28
-A = 29
-D = 30
-E = 31
+Ov = 6
+V = 7
+Vp = 8
+N = 9
+Np = 10
+Val = 11
+Dt = 12
+I = 13
+Ip = 14
+M = 15
+C = 16
+Cp = 17
+B = 18
+F = 19
+Fp = 20
+G = 21
+P = 22
+Pp = 23
+L = 24
+Lp = 25
+R = 26
+Sc = 27
+Pr = 28
+W = 29
+A = 30
+D = 31
+E = 32
 
 # Gramaticas
 S_table = [
     [S, "EOF", None],
-    [S, "INCLUDE", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
+    [S, "INCLUDE", ["INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
     [S, "LEFT_PARENTHESIS", None],
     [S, "RIGHT_PARENTHESIS", None],
     [S, "LEFT_BLOCK", None],
@@ -68,7 +68,7 @@ S_table = [
 ]
 
 Sp_table = [
-    [Sp, "EOF", "VACIA"],
+    [Sp, "EOF", ["VACIA"]],
     [Sp, "INCLUDE", None],
     [Sp, "LEFT_PARENTHESIS", None],
     [Sp, "RIGHT_PARENTHESIS", None],
@@ -371,7 +371,7 @@ Np_table = [
     [Np, "RIGHT_PARENTHESIS", None],
     [Np, "LEFT_BLOCK", None],
     [Np, "RIGHT_BLOCK", None],
-    [Np, "INSTRUCTION_END", ["VACIA"]],
+    [Np, "INSTRUCTION_END", ["INSTRUCTION_END"]],
     [Np, "COMMA", ["COMMA", Vp]],
     [Np, "EQUAL", None],
     [Np, "LESS_THAN", None],
@@ -978,6 +978,7 @@ Sc_table = [
             "LEFT_PARENTHESIS",
             "STRING",
             "COMMA",
+            "AMPERSAND",
             "IDENTIFIER",
             "RIGHT_PARENTHESIS",
             "INSTRUCTION_END",
@@ -1177,13 +1178,41 @@ E_table = [
 ]
 
 
-general_table = [
-    [S, "EOF", None],
-    [S, "#INCLUDE", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
-    [S, "LEFT_PARENTHESIS", None],
-    [S, "RIGHT_PARENTHESIS", None],
-    [S, "COMMENT", ["#INCLUDE", "LESS_THAN", "IDENTIFIER", "GREATER_THAN", Sp]],
-]
+general_table = (
+    S_table
+    + Sp_table
+    + O_table
+    + Op_table
+    + T_table
+    + Tp_table
+    + Ov_table
+    + V_table
+    + Vp_table
+    + N_table
+    + Np_table
+    + Val_table
+    + Dt_table
+    + I_table
+    + Ip_table
+    + M_table
+    + C_table
+    + Cp_table
+    + B_Table
+    + F_table
+    + Fp_table
+    + G_table
+    + P_table
+    + Pp_table
+    + L_table
+    + Lp_table
+    + R_table
+    + Sc_table
+    + Pr_table
+    + W_table
+    + A_table
+    + D_table
+    + E_table
+)
 
 
 template = [
