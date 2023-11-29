@@ -193,7 +193,6 @@ lexer = lex.lex()
 def executeCustomParser():
     f = open("c_example_two.c", "r")
     lexer.input(f.read())
-    # lexer.input("int a, b c;$")
 
     tok = lexer.token()
     x = stack[-1]  # primer elemento de der a izq (Ultimo elemento)
@@ -207,6 +206,7 @@ def executeCustomParser():
                 # X es el token esperado y no ha terminado
                 print("Current X: ", x)
                 print("Expected type: ", tok.type)
+                print("Bingo!")
                 print("\n")
 
                 stack.pop()
