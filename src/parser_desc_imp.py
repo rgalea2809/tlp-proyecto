@@ -188,47 +188,46 @@ stack = ["EOF", 0]
 
 # Lexer
 lexer = lex.lex()
+f = open("c_example.c", "r")
+lexer.input(f.read())
+
+currentToken = lexer.token()
+x = stack[-1]  # primer elemento de der a izq (Ultimo elemento)
 
 
 def executeCustomParser():
-    f = open("c_example.c", "r")
-    lexer.input(f.read())
-
-    tok = lexer.token()
-    x = stack[-1]  # primer elemento de der a izq (Ultimo elemento)
+    global x
+    global currentToken
+    global lexer
+    global stack
 
     while True:
-        if x == tok.type and x == "EOF":
+        if x == currentToken.type and x == "EOF":
             print("File recognized successfully")
             return
         else:
-            if x == tok.type and x != "EOF":
+            if x == currentToken.type and x != "EOF":
                 # X es el token esperado y no ha terminado
                 print("Current X: ", x)
-                print("Expected type: ", tok.type)
-                print("Bingo!")
+                print("Expected type: ", currentToken.type)
                 print("\n")
 
                 stack.pop()
                 x = stack[-1]
-                tok = lexer.token()
-            if x in tokens and x != tok.type:
+                currentToken = lexer.token()
+            if x in tokens and x != currentToken.type:
                 # X es un token pero no el esperado
-                print("Error: se esperaba ", tok.type)
-                return 0
+                handle_error()
             if x not in tokens:  # X es no terminal
                 print("\n")
                 print("Non terminal found: ", x)
-                print("Current Token: " + str(tok))
+                print("Current Token: " + str(currentToken))
                 print("\n")
 
-                celda = buscar_en_tabla(x, tok.type)
+                celda = buscar_en_tabla(x, currentToken.type)
 
                 if celda is None:
-                    print("Error: No se esperaba ", tok.type)
-                    print("En Linea: ", tok.lineno, ", Posicion: ", tok.lexpos)
-
-                    return 0
+                    handle_error()
                 else:
                     print("Found matching Pair")
                     stack.pop()
@@ -236,6 +235,43 @@ def executeCustomParser():
                     print("New Stack State: ", stack)
                     print("\n")
                     x = stack[-1]
+
+
+def handle_error():
+    global x
+    global currentToken
+    global lexer
+    global stack
+
+    print("Found error!")
+    print("Triggering panic mode...")
+    print("Current stack: ", stack)
+
+    hasFoundNonTerminal = False
+
+    # Removes items from stack until it finds a terminal
+    while not hasFoundNonTerminal and len(stack) > 0:
+        removedItem = stack.pop()
+        print("Removed ", removedItem, " from stack.")
+
+        if stack[-1] in tokens:
+            hasFoundNonTerminal = True
+
+    hasFoundMatchingToken = False
+    hasTokensLeft = True
+
+    while not hasFoundMatchingToken and hasTokensLeft:
+        print("Evaluating token: ", currentToken)
+        if not currentToken:
+            hasTokensLeft = False
+            print("")
+            break
+
+        if currentToken.type == stack[-1]:
+            hasFoundMatchingToken = True
+            break
+
+        currentToken = lexer.token()
 
 
 def buscar_en_tabla(no_terminal, terminal):
