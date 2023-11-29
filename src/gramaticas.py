@@ -1072,7 +1072,6 @@ W_table = [
             "LEFT_BLOCK",
             L,
             "RIGHT_BLOCK",
-            "INSTRUCTION_END",
         ],
     ],
     [W, "RETURN", None],

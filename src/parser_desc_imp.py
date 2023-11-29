@@ -26,7 +26,7 @@ tokens = [
     "RIGHT_PARENTHESIS",
     "LEFT_BLOCK",
     "RIGHT_BLOCK",
-    "LINE_COMMENT",
+    "COMMENT",
     "BLOCK_COMMENT",
     "PLUS",
     "MINUS",
@@ -55,6 +55,7 @@ def t_IDENTIFIER(t):
     return t
 
 
+t_EQUALS = r"\=\="
 t_EQUAL = r"\="
 t_LESS_THAN = r"\<"
 t_GREATER_THAN = r"\>"
@@ -64,7 +65,7 @@ t_LEFT_BLOCK = r"\{"
 t_RIGHT_BLOCK = r"\}"
 
 
-def t_LINE_COMMENT(t):
+def t_COMMENT(t):
     r"\/\/.*"
     return t
 
@@ -79,9 +80,8 @@ t_MINUS = r"-"
 t_TIMES = r"\*"
 t_DIVIDE = r"/"
 t_AND = r"&&"
-t_OR = r"\|"
+t_OR = r"\|\|"
 t_NOT = r"\!"
-t_EQUALS = r"\=\="
 t_INSTRUCTION_END = r"\;"
 
 
