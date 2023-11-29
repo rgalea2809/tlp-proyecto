@@ -547,7 +547,7 @@ M_table = [
     [M, "INCLUDE", None],
     [M, "LEFT_PARENTHESIS", None],
     [M, "RIGHT_PARENTHESIS", None],
-    [M, "LEFT_BLOCK", ["LEFT_BLOCK", L, "RIGHT_BLOCK", "INSTRUCTION_END"]],
+    [M, "LEFT_BLOCK", ["LEFT_BLOCK", L, "RIGHT_BLOCK"]],
     [M, "RIGHT_BLOCK", None],
     [M, "INSTRUCTION_END", None],
     [M, "COMMA", None],
@@ -976,7 +976,7 @@ Sc_table = [
         [
             "SCANF",
             "LEFT_PARENTHESIS",
-            "STRING",
+            "STRING_DEFINITION",
             "COMMA",
             "AMPERSAND",
             "IDENTIFIER",
@@ -1021,7 +1021,7 @@ Pr_table = [
         [
             "PRINTF",
             "LEFT_PARENTHESIS",
-            "STRING",
+            "STRING_DEFINITION",
             E,
             "RIGHT_PARENTHESIS",
             "INSTRUCTION_END",

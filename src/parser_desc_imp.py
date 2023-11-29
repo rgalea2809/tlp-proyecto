@@ -95,12 +95,12 @@ t_COMMA = r"\,"
 
 
 def t_STRING_DEFINITION(t):
-    r"^\"(.+)\"$"
+    r'"([^"]*)"'
     return t
 
 
 def t_CHAR_DEFINITION(t):
-    r"^\"[\w]$"
+    r'"(.)"'
     return t
 
 
@@ -200,7 +200,7 @@ def executeCustomParser():
 
     while True:
         if x == tok.type and x == "EOF":
-            print("Cadena reconocida exitosamente")
+            print("File recognized successfully")
             return
         else:
             if x == tok.type and x != "EOF":
