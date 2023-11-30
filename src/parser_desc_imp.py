@@ -1,5 +1,98 @@
 import ply.lex as lex
+import json
+from tabulate import tabulate
 from gramaticas import general_table
+
+
+# Definición de Tabla Hash
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.next = None
+
+
+class HashTable:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.size = 0
+        self.table = [None] * capacity
+
+    def _hash(self, key):
+        return hash(key) % self.capacity
+
+    def insert(self, key, value):
+        index = self._hash(key)
+
+        if self.table[index] is None:
+            self.table[index] = Node(key, value)
+            self.size += 1
+        else:
+            current = self.table[index]
+            while current:
+                if current.key == key:
+                    current.value = value
+                    return
+                current = current.next
+            new_node = Node(key, value)
+            new_node.next = self.table[index]
+            self.table[index] = new_node
+            self.size += 1
+
+    def search(self, key):
+        index = self._hash(key)
+
+        current = self.table[index]
+        while current:
+            if current.key == key:
+                return current.value
+            current = current.next
+
+        raise KeyError(key)
+
+    def remove(self, key):
+        index = self._hash(key)
+
+        previous = None
+        current = self.table[index]
+
+        while current:
+            if current.key == key:
+                if previous:
+                    previous.next = current.next
+                else:
+                    self.table[index] = current.next
+                self.size -= 1
+                return
+            previous = current
+            current = current.next
+
+        raise KeyError(key)
+
+    def __len__(self):
+        return self.size
+
+    def __contains__(self, key):
+        try:
+            self.search(key)
+            return True
+        except KeyError:
+            return False
+
+    def printProperties(self):
+        print("Length: " + str(self.size))
+
+
+# ANSI color codes
+class Colors:
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[95m"
+    CYAN = "\033[96m"
+    RESET = "\033[0m"
+
 
 # reserved words list:
 reserved = {
@@ -180,6 +273,9 @@ lexer.input(file_content)
 currentToken = lexer.token()
 x = stack[-1]  # primer elemento de der a izq (Ultimo elemento)
 errorCount = 0
+tokenCount = 0
+retrievedTokensList = []
+errorsList = []
 
 
 def executeCustomParser():
@@ -188,26 +284,34 @@ def executeCustomParser():
     global lexer
     global stack
     global errorCount
+    global tokenCount
+    global retrievedTokensList
+
+    print(f"{Colors.CYAN}Starting syntax check... \n{Colors.RESET}")
+    retrievedTokensList.append(currentToken)
+    tokenCount += 1
 
     while True:
         if x == currentToken.type and x == "EOF":
-            print("File recognized successfully with ", errorCount, " errors.")
+            perform_end_action()
             return
         else:
             if x == currentToken.type and x != "EOF":
                 # X es el token esperado y no ha terminado
-                print("Current X: ", x)
                 print("Expected type: ", currentToken.type)
+                print("Current X: ", x)
                 print("\n")
 
                 stack.pop()
                 x = stack[-1]
+
                 currentToken = lexer.token()
+                retrievedTokensList.append(currentToken)
+                tokenCount += 1
             if x in tokens and x != currentToken.type:
                 # X es un token pero no el esperado
                 handle_error()
             if x not in tokens:  # X es no terminal
-                print("\n")
                 print("Non terminal found: ", x)
                 print("Current Token: " + str(currentToken))
                 print("\n")
@@ -231,6 +335,12 @@ synchronization_tokens = [
     "RIGHT_BLOCK",
     "RETURN",
     "EOF",
+    "INT",
+    "CHAR",
+    "STRING",
+    "FLOAT",
+    "IF",
+    "ELSE",
 ]
 
 
@@ -241,11 +351,26 @@ def handle_error():
     global stack
     global synchronization_tokens
     global errorCount
+    global tokenCount
+    global retrievedTokensList
+    global errorsList
 
     errorCount += 1
-    print("Found error!")
-    print("Triggering panic mode...")
-    print("Current stack: ", stack)
+    errorsList.append([currentToken, stack])
+
+    print("\n")
+    print("----------------->")
+    print(
+        f"{Colors.RED}Syntax error found at{Colors.RESET}",
+        f"{Colors.RED}line",
+        currentToken.lineno,
+        ", position ",
+        currentToken.lexpos,
+        f"{Colors.RESET}",
+    )
+    print(f"{Colors.RED}Triggering panic mode...{Colors.RESET}")
+    print(f"{Colors.YELLOW}Current stack: ", stack, f"{Colors.RESET}")
+    print("\n")
 
     recoveredFromError = False
     recoveryIterations = 1
@@ -266,11 +391,13 @@ def handle_error():
             if not currentToken:
                 hasTokensLeft = False
                 print("Cannot recover from error")
+                print("<-----------------")
                 return
 
             if currentToken.type == "EOF":
-                print("Did not find sync tokens")
+                print("Did not find sync tokens.")
                 print("Proceeding to end parsing.")
+                print("<-----------------")
                 x = currentToken.type
                 return
 
@@ -284,6 +411,8 @@ def handle_error():
             # Token is not sync token
             # Get next token
             currentToken = lexer.token()
+            retrievedTokensList.append(currentToken)
+            tokenCount += 1
 
         hasFoundMatchingSyncToken = False
         if currentToken.type in stack:
@@ -298,6 +427,8 @@ def handle_error():
         else:
             print("Token is not in current stack.")
             currentToken = lexer.token()
+            retrievedTokensList.append(currentToken)
+            tokenCount += 1
             continue
 
         if hasFoundMatchingSyncToken:
@@ -305,7 +436,80 @@ def handle_error():
             print("Proceeding to recover with token: ", currentToken)
             print("New Stack: ", stack)
             print("New x: ", x)
+            print("<-----------------")
             return
+
+
+def perform_end_action():
+    global x
+    global currentToken
+    global lexer
+    global stack
+    global errorCount
+    global tokenCount
+    global retrievedTokensList
+    global errorsList
+
+    print(f"{Colors.GREEN}File scan ended{Colors.RESET}")
+
+    print(f"{Colors.MAGENTA}Found", tokenCount, f"tokens{Colors.RESET}")
+    create_tokens_hash_table(retrievedTokensList)
+
+    print("\n")
+    print(
+        f"{Colors.RED}Errors found: ",
+        errorCount,
+        f"{Colors.RESET}",
+    )
+
+    if len(errorsList) > 0:
+        create_errors_hash_table(errorsList)
+
+    return
+
+
+def create_tokens_hash_table(tokens):
+    counter = 1
+    table = HashTable(len(tokens))
+
+    keys = []
+    for i in range(0, len(tokens)):
+        key = i + 1
+        keys.append(str(key))
+        table.insert(str(key), tokens[i])
+
+    formattedData = []
+    for key in keys:
+        token = table.search(key)
+        formattedData.append([key, token.type, token.value, token.lineno, token.lexpos])
+
+    print("\nHashed Tokens table")
+    headers = ["Id", "Token type", "Value", "Line", "Pos"]
+    print(tabulate(formattedData, headers, tablefmt="fancy_grid"))
+
+
+def create_errors_hash_table(errors):
+    counter = 1
+    table = HashTable(len(errors))
+
+    keys = []
+    for i in range(0, len(errors)):
+        key = i + 1
+        keys.append(str(key))
+        table.insert(str(key), errors[i])
+
+    formattedData = []
+    for key in keys:
+        error = table.search(key)
+        formattedData.append(
+            [key, error[0].type, error[0].lineno, error[0].lexpos, error[1]]
+        )
+
+    print(
+        f"{Colors.RED}Hashed errors table",
+    )
+    headers = ["Id", "Unexpected Token", "Line", "Pos", "Stack"]
+    print(tabulate(formattedData, headers, tablefmt="fancy_grid"), f"{Colors.RESET}")
 
 
 def buscar_en_tabla(no_terminal, terminal):
@@ -320,10 +524,6 @@ def agregar_pila(produccion):
     for elemento in reversed(produccion):
         if elemento != "VACIA":  # la vacía no la inserta
             stack.append(elemento)
-        else:
-            print("--------------")
-            print("-Found VACIA-")
-            print("--------------")
 
 
 executeCustomParser()
