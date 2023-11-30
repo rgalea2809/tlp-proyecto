@@ -189,7 +189,9 @@ stack = ["EOF", 0]
 # Lexer
 lexer = lex.lex()
 f = open("c_example.c", "r")
-lexer.input(f.read())
+file_content = f.read()
+file_content += "$"
+lexer.input(file_content)
 
 currentToken = lexer.token()
 x = stack[-1]  # primer elemento de der a izq (Ultimo elemento)
@@ -237,41 +239,83 @@ def executeCustomParser():
                     x = stack[-1]
 
 
+synchronization_tokens = [
+    "INSTRUCTION_END",
+    "LEFT_BLOCK",
+    "RIGHT_BLOCK",
+    "RETURN",
+]
+
+
 def handle_error():
     global x
     global currentToken
     global lexer
     global stack
+    global synchronization_tokens
 
     print("Found error!")
     print("Triggering panic mode...")
     print("Current stack: ", stack)
 
-    hasFoundNonTerminal = False
-
-    # Removes items from stack until it finds a terminal
-    while not hasFoundNonTerminal and len(stack) > 0:
-        removedItem = stack.pop()
-        print("Removed ", removedItem, " from stack.")
-
-        if stack[-1] in tokens:
-            hasFoundNonTerminal = True
-
-    hasFoundMatchingToken = False
-    hasTokensLeft = True
-
-    while not hasFoundMatchingToken and hasTokensLeft:
-        print("Evaluating token: ", currentToken)
+    recoveredFromError = False
+    recoveryIterations = 1
+    while not recoveredFromError:
         if not currentToken:
-            hasTokensLeft = False
-            print("")
-            break
+            # No more tokens left :(
+            return
 
-        if currentToken.type == stack[-1]:
-            hasFoundMatchingToken = True
-            break
+        print("Recovery iteration number: ", recoveryIterations)
+        recoveryIterations += 1
 
-        currentToken = lexer.token()
+        hasFoundSyncTokenInTokens = False
+        hasTokensLeft = True
+        while not hasFoundSyncTokenInTokens and hasTokensLeft:
+            print("Evaluating token: ", currentToken)
+            # No tokens left
+            # Cannot recover
+            if not currentToken:
+                hasTokensLeft = False
+                print("Cannot recover from error")
+                return
+
+            if currentToken.type == "EOF":
+                print("Did not find sync tokens")
+                print("Proceeding to end parsing.")
+                x = currentToken.type
+                return
+
+            # Can recover from this error
+            # Current token is a sync token
+            if currentToken.type in synchronization_tokens:
+                print("Token is candidate for recovery.")
+                hasFoundSyncTokenInTokens = True
+                break
+
+            # Token is not sync token
+            # Get next token
+            currentToken = lexer.token()
+
+        hasFoundMatchingSyncToken = False
+        if currentToken.type in stack:
+            print("Token is in current stack...")
+            while len(stack) > 0:
+                if stack[-1] == currentToken.type:
+                    hasFoundMatchingSyncToken = True
+                    recoveredFromError = True
+                    break
+                else:
+                    stack.pop()
+        else:
+            print("Token is not in current stack.")
+            continue
+
+        if hasFoundMatchingSyncToken:
+            x = currentToken.type
+            print("Proceeding to recover with token: ", currentToken)
+            print("New Stack: ", stack)
+            print("New x: ", x)
+            return
 
 
 def buscar_en_tabla(no_terminal, terminal):
