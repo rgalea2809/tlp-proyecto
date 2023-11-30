@@ -16,6 +16,7 @@ I = 13
 Ip = 14
 M = 15
 C = 16
+Ol = 161
 Cp = 17
 B = 18
 F = 19
@@ -23,6 +24,7 @@ Fp = 20
 G = 21
 P = 22
 Pp = 23
+Dtp = 231
 L = 24
 Lp = 25
 R = 26
@@ -61,6 +63,7 @@ S_table = [
     [S, "CHAR", [F, Sp]],
     [S, "INT", [F, Sp]],
     [S, "FLOAT", [F, Sp]],
+    [S, "VOID", [F, Sp]],
     [S, "PRINTF", None],
     [S, "SCANF", None],
     [S, "WHILE", None],
@@ -94,6 +97,7 @@ Sp_table = [
     [Sp, "CHAR", [F, Sp]],
     [Sp, "INT", [F, Sp]],
     [Sp, "FLOAT", [F, Sp]],
+    [Sp, "VOID", [F, Sp]],
     [Sp, "PRINTF", None],
     [Sp, "SCANF", None],
     [Sp, "WHILE", None],
@@ -142,9 +146,12 @@ Op_table = [
     [Op, "RIGHT_BLOCK", None],
     [Op, "INSTRUCTION_END", ["VACIA"]],
     [Op, "COMMA", ["VACIA"]],
-    [Op, "EQUAL", ["VACIA"]],
+    [Op, "EQUALS", ["VACIA"]],
     [Op, "LESS_THAN", ["VACIA"]],
     [Op, "GREATER_THAN", ["VACIA"]],
+    [Op, "AND", ["VACIA"]],
+    [Op, "OR", ["VACIA"]],
+    [Op, "NOT", ["VACIA"]],
     [Op, "PLUS", ["PLUS", T, Op]],
     [Op, "MINUS", ["MINUS", T, Op]],
     [Op, "TIMES", None],
@@ -208,9 +215,12 @@ Tp_table = [
     [Tp, "RIGHT_BLOCK", None],
     [Tp, "INSTRUCTION_END", ["VACIA"]],
     [Tp, "COMMA", ["VACIA"]],
-    [Tp, "EQUAL", ["VACIA"]],
+    [Tp, "EQUALS", ["VACIA"]],
     [Tp, "LESS_THAN", ["VACIA"]],
     [Tp, "GREATER_THAN", ["VACIA"]],
+    [Tp, "AND", ["VACIA"]],
+    [Tp, "OR", ["VACIA"]],
+    [Tp, "NOT", ["VACIA"]],
     [Tp, "PLUS", ["VACIA"]],
     [Tp, "MINUS", ["VACIA"]],
     [Tp, "TIMES", ["TIMES", Ov, Tp]],
@@ -515,7 +525,7 @@ Ip_table = [
     [Ip, "LEFT_PARENTHESIS", None],
     [Ip, "RIGHT_PARENTHESIS", None],
     [Ip, "LEFT_BLOCK", None],
-    [Ip, "RIGHT_BLOCK", None],
+    [Ip, "RIGHT_BLOCK", ["VACIA"]],
     [Ip, "INSTRUCTION_END", ["INSTRUCTION_END"]],
     [Ip, "COMMA", None],
     [Ip, "EQUAL", None],
@@ -525,21 +535,21 @@ Ip_table = [
     [Ip, "MINUS", None],
     [Ip, "TIMES", None],
     [Ip, "DIVIDE", None],
-    [Ip, "IDENTIFIER", None],
+    [Ip, "IDENTIFIER", ["VACIA"]],
     [Ip, "CHAR_DEFINITION", None],
     [Ip, "NUMBER", None],
     [Ip, "STRING_DEFINITION", None],
-    [Ip, "IF", None],
+    [Ip, "IF", ["VACIA"]],
     [Ip, "ELSE", ["ELSE", M]],
-    [Ip, "COMMENT", None],
-    [Ip, "STRING", None],
-    [Ip, "CHAR", None],
-    [Ip, "INT", None],
-    [Ip, "FLOAT", None],
-    [Ip, "PRINTF", None],
-    [Ip, "SCANF", None],
-    [Ip, "WHILE", None],
-    [Ip, "RETURN", None],
+    [Ip, "COMMENT", ["VACIA"]],
+    [Ip, "STRING", ["VACIA"]],
+    [Ip, "CHAR", ["VACIA"]],
+    [Ip, "INT", ["VACIA"]],
+    [Ip, "FLOAT", ["VACIA"]],
+    [Ip, "PRINTF", ["VACIA"]],
+    [Ip, "SCANF", ["VACIA"]],
+    [Ip, "WHILE", ["VACIA"]],
+    [Ip, "RETURN", ["VACIA"]],
 ]
 
 M_table = [
@@ -591,9 +601,9 @@ C_table = [
     [C, "MINUS", None],
     [C, "TIMES", None],
     [C, "DIVIDE", None],
-    [C, "IDENTIFIER", [O, Cp]],
+    [C, "IDENTIFIER", [O, Cp, Ol]],
     [C, "CHAR_DEFINITION", None],
-    [C, "NUMBER", [O, Cp]],
+    [C, "NUMBER", [O, Cp, Ol]],
     [C, "STRING_DEFINITION", None],
     [C, "IF", None],
     [C, "ELSE", None],
@@ -608,6 +618,41 @@ C_table = [
     [C, "RETURN", None],
 ]
 
+Ol_table = [
+    [Ol, "EOF", None],
+    [Ol, "INCLUDE", None],
+    [Ol, "LEFT_PARENTHESIS", None],
+    [Ol, "RIGHT_PARENTHESIS", ["VACIA"]],
+    [Ol, "LEFT_BLOCK", None],
+    [Ol, "RIGHT_BLOCK", None],
+    [Ol, "INSTRUCTION_END", None],
+    [Ol, "COMMA", None],
+    [Ol, "EQUAL", None],
+    [Ol, "LESS_THAN", None],
+    [Ol, "GREATER_THAN", None],
+    [Ol, "AND", ["AND", C]],
+    [Ol, "OR", ["OR", C]],
+    [Ol, "PLUS", None],
+    [Ol, "MINUS", None],
+    [Ol, "TIMES", None],
+    [Ol, "DIVIDE", None],
+    [Ol, "IDENTIFIER", None],
+    [Ol, "CHAR_DEFINITION", None],
+    [Ol, "NUMBER", None],
+    [Ol, "STRING_DEFINITION", None],
+    [Ol, "IF", None],
+    [Ol, "ELSE", None],
+    [Ol, "COMMENT", None],
+    [Ol, "STRING", None],
+    [Ol, "CHAR", None],
+    [Ol, "INT", None],
+    [Ol, "FLOAT", None],
+    [Ol, "PRINTF", None],
+    [Ol, "SCANF", None],
+    [Ol, "WHILE", None],
+    [Ol, "RETURN", None],
+]
+
 Cp_table = [
     [Cp, "EOF", None],
     [Cp, "INCLUDE", None],
@@ -617,9 +662,13 @@ Cp_table = [
     [Cp, "RIGHT_BLOCK", None],
     [Cp, "INSTRUCTION_END", None],
     [Cp, "COMMA", None],
+    [Cp, "EQUALS", ["EQUALS", O]],
     [Cp, "EQUAL", ["EQUAL", B]],
     [Cp, "LESS_THAN", ["LESS_THAN", B]],
     [Cp, "GREATER_THAN", ["GREATER_THAN", B]],
+    [Cp, "AND", None],
+    [Cp, "OR", None],
+    [Cp, "NOT", ["NOT", "EQUAL", O]],
     [Cp, "PLUS", None],
     [Cp, "MINUS", None],
     [Cp, "TIMES", None],
@@ -697,10 +746,11 @@ F_table = [
     [F, "IF", None],
     [F, "ELSE", None],
     [F, "COMMENT", None],
-    [F, "STRING", [Dt, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
-    [F, "CHAR", [Dt, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
-    [F, "INT", [Dt, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
-    [F, "FLOAT", [Dt, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
+    [F, "STRING", [Dtp, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
+    [F, "CHAR", [Dtp, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
+    [F, "INT", [Dtp, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
+    [F, "FLOAT", [Dtp, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
+    [F, "VOID", [Dtp, "IDENTIFIER", "LEFT_PARENTHESIS", G, "RIGHT_PARENTHESIS", Fp]],
     [F, "PRINTF", None],
     [F, "SCANF", None],
     [F, "WHILE", None],
@@ -837,6 +887,40 @@ Pp_table = [
     [Pp, "SCANF", None],
     [Pp, "WHILE", None],
     [Pp, "RETURN", None],
+]
+
+Dtp_table = [
+    [Dtp, "EOF", None],
+    [Dtp, "INCLUDE", None],
+    [Dtp, "LEFT_PARENTHESIS", None],
+    [Dtp, "RIGHT_PARENTHESIS", None],
+    [Dtp, "LEFT_BLOCK", None],
+    [Dtp, "RIGHT_BLOCK", None],
+    [Dtp, "INSTRUCTION_END", None],
+    [Dtp, "COMMA", None],
+    [Dtp, "EQUAL", None],
+    [Dtp, "LESS_THAN", None],
+    [Dtp, "GREATER_THAN", None],
+    [Dtp, "PLUS", None],
+    [Dtp, "MINUS", None],
+    [Dtp, "TIMES", None],
+    [Dtp, "DIVIDE", None],
+    [Dtp, "IDENTIFIER", None],
+    [Dtp, "CHAR_DEFINITION", None],
+    [Dtp, "NUMBER", None],
+    [Dtp, "STRING_DEFINITION", None],
+    [Dtp, "IF", None],
+    [Dtp, "ELSE", None],
+    [Dtp, "COMMENT", None],
+    [Dtp, "STRING", [Dt]],
+    [Dtp, "CHAR", [Dt]],
+    [Dtp, "INT", [Dt]],
+    [Dtp, "FLOAT", [Dt]],
+    [Dtp, "VOID", ["VOID"]],
+    [Dtp, "PRINTF", None],
+    [Dtp, "SCANF", None],
+    [Dtp, "WHILE", None],
+    [Dtp, "RETURN", None],
 ]
 
 L_table = [
@@ -1195,6 +1279,7 @@ general_table = (
     + Ip_table
     + M_table
     + C_table
+    + Ol_table
     + Cp_table
     + B_Table
     + F_table
@@ -1202,6 +1287,7 @@ general_table = (
     + G_table
     + P_table
     + Pp_table
+    + Dtp_table
     + L_table
     + Lp_table
     + R_table

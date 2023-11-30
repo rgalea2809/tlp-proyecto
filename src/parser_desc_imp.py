@@ -145,6 +145,7 @@ I = 13
 Ip = 14
 M = 15
 C = 16
+Ol = 161
 Cp = 17
 B = 18
 F = 19
@@ -152,6 +153,7 @@ Fp = 20
 G = 21
 P = 22
 Pp = 23
+Dtp = 231
 L = 24
 Lp = 25
 R = 26
@@ -162,24 +164,6 @@ A = 30
 D = 31
 E = 32
 
-tabla_ejemplo = [
-    [S, "IDENTIFIER", None],
-    [S, "INT", [Tp, "IDENTIFIER", D]],
-    [S, "FLOAT", [Tp, "IDENTIFIER", D]],
-    [S, "COMMA", None],
-    [S, "INSTRUCTION_END", None],
-    [Tp, "IDENTIFIER", None],
-    [Tp, "INT", ["INT"]],
-    [Tp, "FLOAT", ["FLOAT"]],
-    [Tp, "COMMA", None],
-    [Tp, "INSTRUCTION_END", None],
-    [D, "IDENTIFIER", None],
-    [D, "INT", None],
-    [D, "FLOAT", None],
-    [D, "COMMA", ["COMMA", "IDENTIFIER", D]],
-    [D, "INSTRUCTION_END", ["INSTRUCTION_END"]],
-]
-
 # Gramaticas
 tabla = general_table
 
@@ -188,13 +172,14 @@ stack = ["EOF", 0]
 
 # Lexer
 lexer = lex.lex()
-f = open("c_example.c", "r")
+f = open("c_example_full.c", "r")
 file_content = f.read()
 file_content += "$"
 lexer.input(file_content)
 
 currentToken = lexer.token()
 x = stack[-1]  # primer elemento de der a izq (Ultimo elemento)
+errorCount = 0
 
 
 def executeCustomParser():
@@ -202,10 +187,11 @@ def executeCustomParser():
     global currentToken
     global lexer
     global stack
+    global errorCount
 
     while True:
         if x == currentToken.type and x == "EOF":
-            print("File recognized successfully")
+            print("File recognized successfully with ", errorCount, " errors.")
             return
         else:
             if x == currentToken.type and x != "EOF":
@@ -241,9 +227,10 @@ def executeCustomParser():
 
 synchronization_tokens = [
     "INSTRUCTION_END",
-    "LEFT_BLOCK",
+    "RIGHT_PARENTHESIS",
     "RIGHT_BLOCK",
     "RETURN",
+    "EOF",
 ]
 
 
@@ -253,7 +240,9 @@ def handle_error():
     global lexer
     global stack
     global synchronization_tokens
+    global errorCount
 
+    errorCount += 1
     print("Found error!")
     print("Triggering panic mode...")
     print("Current stack: ", stack)
@@ -308,6 +297,7 @@ def handle_error():
                     stack.pop()
         else:
             print("Token is not in current stack.")
+            currentToken = lexer.token()
             continue
 
         if hasFoundMatchingSyncToken:

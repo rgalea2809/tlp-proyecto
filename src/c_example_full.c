@@ -5,11 +5,6 @@ char getChar()
     return "a";
 }
 
-void voidFunc()
-{
-    return;
-}
-
 int main()
 {
     // This is a comment
@@ -60,15 +55,9 @@ int main()
     }
 
     // NOT
-    if (!1 < 2)
+    if (1 != 2)
     {
         printf("NOT Test");
     }
-
-    /* Block Comment
-        Block comment asdasd
-        asdasd
-    */
-
     return 0;
 }
