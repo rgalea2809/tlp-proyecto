@@ -330,18 +330,32 @@ def executeCustomParser():
 
 
 synchronization_tokens = [
-    "INSTRUCTION_END",
-    "RIGHT_PARENTHESIS",
-    "RIGHT_BLOCK",
-    "RETURN",
     "EOF",
+    "INSTRUCTION_END",
+    "LEFT_PARENTHESIS",
+    "RIGHT_PARENTHESIS",
     "INT",
     "CHAR",
     "STRING",
     "FLOAT",
+    "VOID",
     "IF",
     "ELSE",
+    "LEFT_BLOCK",
+    "RIGHT_BLOCK",
+    "PRINTF",
+    "RETURN",
+    "WHILE",
+    "SCANF",
 ]
+
+# Conjuntos
+start_block = [S, Sp]
+operaciones = [O, Op, T, Tp, Ov]
+variables = [V, Vp, N, Np, Val, Dt]
+conditionals = [I, Ip, M, C, Ol, Cp, B]
+funcs_and_params = [F, Fp, G, P, Pp, Dtp]
+block = [L, Lp, R, Sc, Pr, W, A, D, E]
 
 
 def handle_error():
